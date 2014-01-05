@@ -1,4 +1,6 @@
-fits
+FITS
 ====
 
-JavaScript library for handling FITS astronomical format. (http://fits.gsfc.nasa.gov/)
+JavaScript library for handling FITS astronomical format (http://fits.gsfc.nasa.gov/).
+
+
