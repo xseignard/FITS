@@ -5,18 +5,16 @@ Installation:
 
     npm install fits
 
-
 ## Usage:
 
-Synchronous processing of lines:
+To read and get the FITS headers (HDU):
 
 	var fits = require('FITS');
 
-
-	var FITS = new fits('fits/samples/2dF-361520.fits');
-  	FITS.on('loaded', function(){
+	fits.readFile(file, function(err, FITS){
+		if(err) return console.error(err);
 		console.log(FITS.HDU.primary);
-  	});
+	});
 
 
 

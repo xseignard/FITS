@@ -15,34 +15,35 @@ var path = require('path'),
     mmmagic = require('mmmagic').Magic,
     magic = new mmmagic(), filetype = ''; // Detects file types (.gz, FITS)
 
-var FITS = function(filepath, options){
+var FITS = function(s){
   this.HDU = { "primary": {}, "extensions": [] }; this.images = []; this.tables = []; //FITS object
-  this._encoding = options && options.encoding || 'utf8';
   self = this;
-
-  filepath = path.normalize(filepath);
-  fs.readFile(filepath, function (err, buffer) {
-    if(err) return console.error(err);
-
-    magic.detectFile(filepath, function(err, result) {
-      if(err) return console.error(err);
-
-      var readers = { // Accoding to file type and compressions
-        'gzip': function(callback){
-          zlib.gunzip(buffer, function(err, result) { // If gzip
-            if(err){ return console.error(err) } else { return callback(result) } }) },
-        'FITS': function(callback){ return callback(buffer) } }
-
-      filetype = result.substr(0, result.indexOf(' '));
-      if(!(filetype in readers)){ return console.error('Unknown file type: '+filetype) }
-      readers[filetype](self.getFITSdata);
-  }) }) }
+}
 
 util.inherits(FITS, events.EventEmitter); // Events
 
-FITS.prototype.getFITSdata = function(data){ // Parse multiple headers
-  var raw = data;
-  data = data.toString(); // Needs to extract images and tables according
+FITS.prototype.readFile = function(filepath, callback){
+
+  filepath = path.normalize(filepath);
+  fs.readFile(filepath, function (err, buffer) {
+    if(err) return callback(err);
+
+    magic.detectFile(filepath, function(err, result) {
+      if(err) return callback(err);
+      filetype = result.substr(0, result.indexOf(' '));
+
+      if(filetype=='gzip'){
+        zlib.gunzip(buffer, function(err, result) { // If gzip
+          if(err) return callback(err);
+          self.getFITSdata(result, function(err, self){ return callback(err, self)}) }) }
+      else if(filetype=='FITS'){
+        self.getFITSdata(buffer, function(err, self){ return callback(err, self)}) }
+      else { return callback('Unknown file type: '+filetype) } }) }) }
+
+
+FITS.prototype.getFITSdata = function(data, callback){ // Parse multiple headers
+
+  var data = data.toString(); // Needs to extract images and tables according
   var headerFlag = true, headerBlock = {}, dataBlock = [], line = '', primary = true;
 
   var saveHeader = function(headerBlock, dataBlock){
@@ -67,10 +68,10 @@ FITS.prototype.getFITSdata = function(data){ // Parse multiple headers
           // console.log(prop[0].trim() + ' = ' + prop[1].trim()); // data
           // console.log(prop[0].trim() + ' = ' + main[1].trim()); // metadata
           headerBlock[prop[0].trim()] = prop[1].trim(); }
-        else { return console.error('FITS HDU is faulty: '+line); } } } }
+        else { return callback('FITS HDU is faulty: '+line); } } } }
 
   saveHeader(headerBlock, dataBlock);
-  self.emit('loaded');
+  return callback(null, self);
 }
 
-module.exports = FITS;
+module.exports = new FITS();
