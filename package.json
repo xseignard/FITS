@@ -1,11 +1,11 @@
 {
-  "author": {
-    "name": "Joe Rosa",
-    "email": "joe.rosa@itpmngt.co.uk"
-  },
   "name": "FITS",
   "description": "JavaScript library for handling FITS astronomical format",
   "version": "0.1.1",
+  "author": {
+    "name": "Joe Rosa",
+    "email": "joe.astrophysics@gmail.com"
+  },
   "keywords": [
     "fits"
   ],
@@ -14,10 +14,13 @@
     "type": "git",
     "url": "https://github.com/itpmngt/FITS.git"
   },
-  "main": "fits.js",
-  "dependencies": {},
-  "devDependencies": {
+  "main": "FITS.js",
+  "dependencies": {
+    "line-by-line": "~0.1.1",
+    "mmmagic": "~0.3.5",
+    "xtend": "~2.1.2"
   },
+  "devDependencies": {},
   "optionalDependencies": {},
   "engines": {
     "node": ">=0.6.0"
