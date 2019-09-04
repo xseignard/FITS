@@ -16,7 +16,7 @@
   },
   "main": "FITS.js",
   "dependencies": {
-    "mmmagic": "~0.3.5"
+    "mmmagic": "~0.5.3"
   },
   "devDependencies": {},
   "optionalDependencies": {},
